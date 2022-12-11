@@ -30,7 +30,8 @@ class AuthRepository {
         _auth = auth,
         _googleSignIn = googleSignIn;
 
-  CollectionReference get _users => _firestore.collection(FirebaseConstants.userCollection);
+  CollectionReference get _users =>
+      _firestore.collection(FirebaseConstants.userCollection);
 
   void signInWithGoogle() async {
     try {
@@ -43,16 +44,22 @@ class AuthRepository {
       UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
-      UserModel userModel = UserModel(
-          name: userCredential.user!.displayName ?? 'No name',
-          profilePic: userCredential.user!.photoURL ?? Constants.avatarDefault,
-          banner: Constants.bannerDefault,
-          uid: userCredential.user!.uid,
-          isAuthenticated: true,
-          karma: 0,
-          awards: []);
-      await _users.doc(userCredential.user!.uid).set(userModel.toMap());
+      UserModel userModel;
 
+      // if user is new then create new information based upon the information...
+      if (userCredential.additionalUserInfo!.isNewUser) {
+        userModel = UserModel(
+            name: userCredential.user!.displayName ?? 'No name',
+            profilePic:
+                userCredential.user!.photoURL ?? Constants.avatarDefault,
+            banner: Constants.bannerDefault,
+            uid: userCredential.user!.uid,
+            isAuthenticated: true,
+            karma: 0,
+            awards: []);
+
+        await _users.doc(userCredential.user!.uid).set(userModel.toMap());
+      }
     } on FirebaseAuthException catch (e) {
       print(e);
     }
