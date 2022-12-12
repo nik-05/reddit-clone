@@ -8,8 +8,9 @@ import 'package:reddit_clone/core/constants/firebase_constants.dart';
 import 'package:reddit_clone/core/providers/firebase_providers.dart';
 import 'package:reddit_clone/core/type_defs.dart';
 import 'package:reddit_clone/models/user_model.dart';
-
 import '../../../core/failure.dart';
+
+final userProvider = StateProvider<UserModel?>((ref) => null);
 
 // creating a provider for auth repository which takes provider from firebase providers
 final authRepositoryProvider = Provider(
@@ -48,7 +49,7 @@ class AuthRepository {
       UserCredential userCredential =
           await _auth.signInWithCredential(credential);
 
-      UserModel userModel;
+       UserModel userModel;
 
       // if user is new then create new information based upon the information...
       if (userCredential.additionalUserInfo!.isNewUser) {
