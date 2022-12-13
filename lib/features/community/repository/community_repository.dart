@@ -24,7 +24,7 @@ class CommunityRepository {
     try {
       var communityDoc = await _communities.doc(community.name).get();
       if (communityDoc.exists) {
-        throw 'Community with thw same name already exists!';
+        throw 'Community with the same name already exists!';
       }
       return right(_communities.doc(community.name).set(community.toMap()));
     } on FirebaseException catch (e) {
@@ -33,4 +33,15 @@ class CommunityRepository {
       return left(Failure(e.toString()));
     }
   }
+
+  Stream<List<Community>> getUserCommunity(String uid) {
+    return _communities.where('members', arrayContains: uid).snapshots().map((events) {
+      List<Community> communities = [];
+      for(var doc in events.docs) {
+        communities.add(Community.fromMap(doc.data() as Map<String, dynamic>));
+      }
+      return communities;
+    });
+  }
+
 }
