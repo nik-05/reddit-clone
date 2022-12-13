@@ -10,11 +10,9 @@ import 'package:reddit_clone/core/type_defs.dart';
 import 'package:reddit_clone/models/user_model.dart';
 import '../../../core/failure.dart';
 
-final userProvider = StateProvider<UserModel?>((ref) => null);
-
 // creating a provider for auth repository which takes provider from firebase providers
-final authRepositoryProvider = Provider(
-  (ref) => AuthRepository(
+final authRepositoryProvider = Provider<AuthRepository>(
+  (ProviderRef ref) => AuthRepository(
     firestore: ref.read(firestoreProvider),
     auth: ref.read(authProvider),
     googleSignIn: ref.read(googleSignInProvider),
@@ -37,6 +35,8 @@ class AuthRepository {
 
   CollectionReference get _users =>
       _firestore.collection(FirebaseConstants.userCollection);
+
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   FutureEither<UserModel> signInWithGoogle() async {
     try {
