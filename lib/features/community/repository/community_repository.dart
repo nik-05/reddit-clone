@@ -9,7 +9,7 @@ import 'package:reddit_clone/models/community_model.dart';
 import '../../../core/type_defs.dart';
 
 final communityRepositoryProvider = Provider(
-    (ref) => CommunityRepository(firestore: ref.watch(firestoreProvider)));
+        (ref) => CommunityRepository(firestore: ref.watch(firestoreProvider)));
 
 class CommunityRepository {
   final FirebaseFirestore _firestore;
@@ -34,6 +34,30 @@ class CommunityRepository {
     }
   }
 
+  FutureVoid joinCommunity(String communityName, String userId) async {
+    try {
+      return right(_communities.doc(communityName).update({
+        'members': FieldValue.arrayUnion([userId])
+      }));
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  FutureVoid leaveCommunity(String communityName, String userId) async {
+    try {
+      return right(_communities.doc(communityName).update({
+        'members': FieldValue.arrayRemove([userId])
+      }));
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
   Stream<List<Community>> getUserCommunity(String uid) {
     return _communities
         .where('members', arrayContains: uid)
@@ -49,7 +73,7 @@ class CommunityRepository {
 
   Stream<Community> getCommunityByName(String name) {
     return _communities.doc(name).snapshots().map(
-        (event) => Community.fromMap(event.data() as Map<String, dynamic>));
+            (event) => Community.fromMap(event.data() as Map<String, dynamic>));
   }
 
   FutureVoid editCommunity(Community community) async {
@@ -65,15 +89,15 @@ class CommunityRepository {
   Stream<List<Community>> searchCommunity(String query) {
     return _communities
         .where(
-          'name',
-          isGreaterThanOrEqualTo: query.isEmpty ? 0 : query,
-          isLessThan: query.isEmpty
-              ? null
-              : query.substring(0, query.length - 1) +
-                  String.fromCharCode(
-                    query.codeUnitAt(query.length - 1) + 1,
-                  ),
-        )
+      'name',
+      isGreaterThanOrEqualTo: query.isEmpty ? 0 : query,
+      isLessThan: query.isEmpty
+          ? null
+          : query.substring(0, query.length - 1) +
+          String.fromCharCode(
+            query.codeUnitAt(query.length - 1) + 1,
+          ),
+    )
         .snapshots()
         .map((event) {
       List<Community> communities = [];
