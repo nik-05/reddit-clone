@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit_clone/core/utils.dart';
 import 'package:reddit_clone/features/auth/repository/auth_repository.dart';
+import 'package:reddit_clone/features/community/controller/community_controller.dart';
+import 'package:reddit_clone/features/community/repository/community_repository.dart';
 import '../../../models/user_model.dart';
 
 final userProvider = StateProvider<UserModel?>((ref) => null);
@@ -49,6 +51,10 @@ class AuthController extends StateNotifier<bool> {
 
   Stream<UserModel> getUserData(String uid) {
     return _authRepository.getUserData(uid);
+  }
+
+  void logOut() async {
+    _authRepository.logOut();
   }
 
 }

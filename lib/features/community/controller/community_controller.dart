@@ -6,18 +6,17 @@ import 'package:reddit_clone/core/constants/constants.dart';
 import 'package:reddit_clone/core/providers/storage_repository_provider.dart';
 import 'package:reddit_clone/features/auth/controller/auth_controller.dart';
 import 'package:routemaster/routemaster.dart';
-import '../../../core/type_defs.dart';
 import '../../../core/utils.dart';
 import '../../../models/community_model.dart';
 
 import '../repository/community_repository.dart';
 
-final userCommunitiesProvider = StreamProvider((ref) {
+final userCommunitiesProvider = StreamProvider.autoDispose((ref) {
   final communityController = ref.watch(communityControllerProvider.notifier);
   return communityController.getUserCommunities();
 });
 
-final getCommunityByNameProvider = StreamProvider.family((ref, String name) {
+final getCommunityByNameProvider = StreamProvider.autoDispose.family((ref, String name) {
   return ref
       .watch(communityControllerProvider.notifier)
       .getUserCommunityByName(name);
